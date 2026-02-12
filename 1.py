@@ -18,7 +18,7 @@ BANNER_NAMA  = "" #terserah
 ID_TWITTER = "com.twitter.android"
 ID_CHROME = "com.android.chrome"
 URL_CITAYAM = "https://citayam.com/" 
-PASSWORD_AKUN = "kontol87"
+PASSWORD_AKUN = "" #sandi isi terserah
 NAMA_FILE_HASIL = "data_akun1.txt"
 BLACKLIST_OTP = ["2024", "2025", "2026", "2023", "123456", "000000"]
 UDID_DEVICE = "" #uid device wajib isi cek dengan perintah adb devices
@@ -499,3 +499,4 @@ def main():
 if __name__ == "__main__":
 
     main()
+
