@@ -1,19 +1,19 @@
-# 🚀 AUTO TWITTER ACCOUNT CREATOR (ANDROID - APPIUM)
+# 🚀 AUTO CREATE TWITTER (ANDROID - APPIUM)
 
-Tools automation untuk membuat akun Twitter/X secara otomatis menggunakan:
+Automation tools untuk membuat akun Twitter/X menggunakan:
 
-- ✅ Python
-- ✅ Appium
-- ✅ ADB
-- ✅ Android Device (Real Device)
-- ✅ Chrome
-- ✅ Temporary Email (citayam.com)
+- Python
+- Appium
+- ADB
+- Android Real Device
+- Chrome
+- Temporary Email (citayam.com)
 
 ---
 
-# 📦 REQUIREMENTS (WAJIB INSTALL)
+# 📦 REQUIREMENTS
 
-## 1️⃣ Install Python (Versi 3.10 – 3.11 Direkomendasikan)
+## 1️⃣ Install Python (3.10 – 3.11 Recommended)
 
 Download:
 https://www.python.org/downloads/
@@ -23,12 +23,12 @@ python --version
 
 ---
 
-## 2️⃣ Install NodeJS (Untuk Appium)
+## 2️⃣ Install NodeJS
 
 Download:
 https://nodejs.org/
 
-Cek versi:
+Cek:
 node -v
 npm -v
 
@@ -39,7 +39,7 @@ npm -v
 Install global:
 npm install -g appium
 
-Install driver UiAutomator2:
+Install driver:
 appium driver install uiautomator2
 
 Cek driver:
@@ -47,21 +47,66 @@ appium driver list
 
 ---
 
-## 4️⃣ Install Android Platform Tools (ADB)
+## 4️⃣ Install Android Platform Tools (ADB) ⚠️ WAJIB
 
 Download:
 https://developer.android.com/tools/releases/platform-tools
 
-Tambahkan folder ke PATH.
-
-Cek device:
-adb devices
+Ekstrak misalnya ke:
+C:\platform-tools
 
 ---
 
-## 5️⃣ Install Dependencies Python
+# ⚠️ PENTING — SET ENVIRONMENT VARIABLE ADB
 
-Buat file requirements.txt lalu isi:
+Script menggunakan perintah:
+
+adb shell cmd connectivity airplane-mode enable
+
+Jika ADB tidak ada di PATH, akan error:
+
+'adb' is not recognized as an internal or external command
+
+## Cara Set PATH di Windows:
+
+1. Tekan Windows + R
+2. Ketik: sysdm.cpl
+3. Masuk tab Advanced
+4. Klik Environment Variables
+5. Di System Variables cari: Path
+6. Klik Edit
+7. Klik New
+8. Tambahkan:
+   C:\platform-tools
+9. Klik OK semua
+
+Restart CMD / VS Code setelah itu.
+
+Tes:
+
+adb devices
+
+Jika device muncul → berhasil.
+
+---
+
+# 🔄 ALTERNATIF TANPA SET PATH (OPSIONAL)
+
+Jika tidak ingin set PATH, ubah script menjadi:
+
+Tambahkan:
+
+ADB_PATH = r"C:\platform-tools\adb.exe"
+
+Lalu ubah perintah menjadi:
+
+cmd_on = f'"{ADB_PATH}" -s {UDID_DEVICE} shell cmd connectivity airplane-mode enable'
+
+---
+
+## 5️⃣ Install Python Dependencies
+
+Buat file requirements.txt:
 
 pyfiglet
 colorama
@@ -69,6 +114,7 @@ Appium-Python-Client
 selenium
 
 Install:
+
 pip install -r requirements.txt
 
 ---
@@ -83,10 +129,10 @@ Aktifkan:
 Cek UDID:
 adb devices
 
-Ubah di script bagian ini sesuai device kamu:
+Ubah di script:
 
-UDID_DEVICE = "ISI_DENGAN_UDID_KAMU"
-DEVICE_NAME = "Nama Device Kamu"
+UDID_DEVICE = "ISI_UDID_KAMU"
+DEVICE_NAME = "NAMA_DEVICE_KAMU"
 
 ---
 
@@ -107,38 +153,37 @@ python 1.py
 
 ---
 
-# ⚙️ FITUR SCRIPT
+# ⚙️ FITUR
 
-✅ Auto Install Twitter jika belum ada  
-✅ Auto Generate Email  
-✅ Auto Isi Biodata  
-✅ Auto Input OTP  
-✅ Auto Set Password  
-✅ Auto Skip Upload Foto  
-✅ Auto Save Data ke TXT  
-✅ Auto Detect Limit / Cloudflare  
-✅ Auto Refresh IP (Mode Pesawat)  
-✅ Loop Unlimited  
+- Auto Install Twitter
+- Auto Generate Email
+- Auto Isi Biodata
+- Auto Ambil OTP
+- Auto Set Password
+- Auto Skip Upload Foto
+- Auto Save TXT
+- Auto Detect Limit / Cloudflare
+- Auto Refresh IP (Mode Pesawat)
+- Loop Unlimited
 
 ---
 
-# 📁 OUTPUT FILE
+# 📁 OUTPUT
 
-File hasil tersimpan di:
-
+File:
 data_akun1.txt
 
 Format:
 
-Username : exampleuser  
-Email    : example@email.com  
-Password : ********  
-Tanggal  : 2026-02-12 10:22:33  
+Username : exampleuser
+Email    : example@email.com
+Password : ********
+Tanggal  : 2026-02-12 10:22:33
 ----------------------------------------
 
 ---
 
-# 🔥 STRUKTUR PROJECT
+# 📂 STRUKTUR PROJECT
 
 AUTO-TWITTER/
 │
@@ -148,32 +193,21 @@ AUTO-TWITTER/
 
 ---
 
-# ⚠️ CATATAN PENTING
-
-- Gunakan REAL DEVICE (lebih stabil dari emulator)
-- Pastikan koneksi internet stabil
-- Jika kena LIMIT → script auto refresh IP
-- Jangan gunakan terlalu agresif
-
----
-
 # 🛠 TROUBLESHOOT
 
 ## Device Tidak Terdeteksi
 
-adb kill-server  
-adb start-server  
-adb devices  
+adb kill-server
+adb start-server
+adb devices
 
 ---
 
 ## Appium Error
 
-Pastikan:
+Cek:
 appium driver list
 
-Driver UiAutomator2 sudah terinstall.
+Pastikan UiAutomator2 terinstall.
 
 ---
-
-
