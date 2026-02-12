@@ -168,19 +168,18 @@ python 1.py
 
 ---
 
-# 📁 OUTPUT
+# 📁 OUTPUT FILE
 
-File:
+File hasil tersimpan di:
+
 data_akun1.txt
 
 Format:
 
-Username : exampleuser
-Email    : example@email.com
-Password : ********
-Tanggal  : 2026-02-12 10:22:33
-
-
+Username : exampleuser  
+Email    : example@email.com  
+Password : ********  
+Tanggal  : 2026-02-12 10:22:33  
 ----------------------------------------
 
 ---
@@ -191,7 +190,6 @@ AUTO-TWITTER/
 │
 ├── 1.py
 ├── requirements.txt
-└── README.md
 
 ---
 
