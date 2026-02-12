@@ -14,15 +14,15 @@ import sys
 import os
 init(autoreset=True)
 BANNER_JUDUL = "AUTO  TWITTER"
-BANNER_NAMA  = "Tools By : Ruff"
+BANNER_NAMA  = "" #terserah
 ID_TWITTER = "com.twitter.android"
 ID_CHROME = "com.android.chrome"
 URL_CITAYAM = "https://citayam.com/" 
 PASSWORD_AKUN = "kontol87"
 NAMA_FILE_HASIL = "data_akun1.txt"
 BLACKLIST_OTP = ["2024", "2025", "2026", "2023", "123456", "000000"]
-UDID_DEVICE = "cfe0fe2" 
-DEVICE_NAME = 'Redmi Note 13 Pro'
+UDID_DEVICE = "" #uid device wajib isi cek dengan perintah adb devices
+DEVICE_NAME = '' #merk device
 CYAN = "\033[96m"
 GREEN = "\033[92m"
 YELLOW = "\033[93m"
@@ -497,4 +497,5 @@ def main():
             print(f"\n{YELLOW}>> 💤 Memulai ulang loop HP Fresh...{RESET}")
             time.sleep(5)
 if __name__ == "__main__":
+
     main()
