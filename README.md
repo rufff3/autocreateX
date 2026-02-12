@@ -184,12 +184,13 @@ Tanggal  : 2026-02-12 10:22:33
 
 ---
 
-# 📂 STRUKTUR PROJECT
+# 🔥 STRUKTUR PROJECT
 
 AUTO-TWITTER/
 │
 ├── 1.py
 ├── requirements.txt
+└── data_akun1.txt
 
 ---
 
