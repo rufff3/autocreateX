@@ -12,17 +12,21 @@ import re
 import subprocess
 import sys
 import os
+import requests
+import string
+
 init(autoreset=True)
-BANNER_JUDUL = "AUTO  TWITTER"
-BANNER_NAMA  = "" #terserah
+
+BANNER_JUDUL = "AUTO   TWITTER"
+BANNER_NAMA  = "Tools By : Ruff"
 ID_TWITTER = "com.twitter.android"
-ID_CHROME = "com.android.chrome"
-URL_CITAYAM = "https://citayam.com/" 
-PASSWORD_AKUN = "" #sandi isi terserah
-NAMA_FILE_HASIL = "data_akun1.txt"
+PASSWORD_AKUN = "CONTOH" #atur pasword tiap akun
+NAMA_FILE_HASIL = "CONTOH.TXT" #nama file output akun berhasil 
 BLACKLIST_OTP = ["2024", "2025", "2026", "2023", "123456", "000000"]
-UDID_DEVICE = "" #uid device wajib isi cek dengan perintah adb devices
-DEVICE_NAME = '' #merk device
+API_KEY = "" #ISI APIKEY DENGAN ANDA MENUJU LINK CITAYAM.COM DAN MEMINTA API KEY
+UDID_DEVICE = ""  #UID DEVICE SETELAH MENJALANKAN PERINTAH ADB DEVICES
+DEVICE_NAME = 'Redmi Note 14 Pro' #gapenting
+
 CYAN = "\033[96m"
 GREEN = "\033[92m"
 YELLOW = "\033[93m"
@@ -30,6 +34,7 @@ RED = "\033[91m"
 MAGENTA = "\033[95m"
 RESET = "\033[0m"
 BOLD = "\033[1m"
+
 options = UiAutomator2Options()
 options.platform_name = 'Android'
 options.automation_name = 'UiAutomator2'
@@ -43,6 +48,7 @@ options.set_capability("newCommandTimeout", 600)
 options.set_capability("waitForIdleTimeout", 100)
 options.set_capability("adbExecTimeout", 60000)
 options.set_capability("uiautomator2ServerInstallTimeout", 60000)
+
 def print_banner():
     os.system('cls' if os.name == 'nt' else 'clear')
     font_judul = pyfiglet.figlet_format(BANNER_JUDUL, font="slant", width=100)
@@ -50,10 +56,12 @@ def print_banner():
     font_nama = pyfiglet.figlet_format(BANNER_NAMA, font="slant", width=100)
     print(Fore.YELLOW + Style.BRIGHT + font_nama)
     print("\n")
+
 def get_random_name():
-    depan = ["Rudi", "Bayu", "Eko", "Dina", "Siti", "Reza", "Fajar", "Adit", "Gilang", "Putri", "Dewi", "Budi", "Sari", "Indra", "Maya", "saikul"]
-    belakang = ["Santoso", "Pratama", "Wijaya", "Kusuma", "Saputra", "Hidayat", "Siregar", "Utami", "Nugroho", "Wibowo", "Subagja", "Ramadhan", "pebrianto"]
+    depan = ["Rudi", "Bayu", "Eko", "Dina", "Siti", "Reza", "Fajar", "Adit", "Gilang", "Putri", "Dewi", "Budi", "Sari", "Indra", "Maya", "saikul", "Rizky", "Nina", "Agus", "Lina", "Hendra", "Dian", "Yudi", "Rina", "Fauzi", "Siska", "Andi", "Wulan", "Eka", "Rama", "Sinta", "Doni", "Mira", "Hadi", "Rani", "Fikri", "Sari", "Ilham", "Nia", "Bambang", "Dina", "Rizal", "Sari", "Yanto", "Lina", "Hendra", "Dian", "Yudi", "Rina", "Fauzi", "Siska", "Andi", "Wulan"]
+    belakang = ["Santoso", "Pratama", "Wijaya", "Kusuma", "Saputra", "Hidayat", "Siregar", "Utami", "Nugroho", "Wibowo", "Subagja", "Ramadhan", "pebrianto", "Putra", "Lestari", "Gunawan", "Sari", "Purnama", "Kurniawan", "Dewi", "Saputro", "Yuliana", "Fadhil", "Amelia", "Hidayah", "Prasetyo", "Sari", "Wahyudi", "Aulia"]
     return f"{random.choice(depan)} {random.choice(belakang)}"
+
 def simpan_akun_ke_txt(username, email):
     user_clean = str(username).replace("\n", "").strip()
     if not user_clean or user_clean == "None" or user_clean == "Akun_Baru":
@@ -69,6 +77,7 @@ def simpan_akun_ke_txt(username, email):
         print(f"{GREEN}>> ✅ DATA BERHASIL DISIMPAN! (User: {user_clean}){RESET}")
     except Exception as e:
         print(f"{RED}❌ Gagal Simpan File: {e}{RESET}")
+
 def tutup_popup_google_smart_lock(driver):
     print(f"{YELLOW}>> 🔒 Cek Popup Google Smart Lock...{RESET}")
     try:
@@ -85,6 +94,7 @@ def tutup_popup_google_smart_lock(driver):
             time.sleep(2)
             driver.activate_app(ID_TWITTER)
     except: pass
+
 def tolak_perizinan(driver):
     print(f"{YELLOW}>> 🛡️ Menunggu Popup Perizinan (4 detik)...{RESET}")
     time.sleep(4) 
@@ -99,9 +109,10 @@ def tolak_perizinan(driver):
                     time.sleep(2)
                     return 
             except: pass
-            time.sleep(1)     
+            time.sleep(1)    
     except Exception as e:
         print(f"{RED}❌ Gagal handle perizinan (Skip): {e}{RESET}")
+
 def refresh_ip_mode_pesawat(driver):
     print(f"\n{RED}>> ✈️ TERDETEKSI ERROR/LIMIT/CLOUDFLARE! MEMULAI REFRESH IP (MODERN)...{RESET}")
     try:
@@ -117,6 +128,7 @@ def refresh_ip_mode_pesawat(driver):
         time.sleep(8)
     except Exception as e:
         print(f"{RED}❌ Gagal Mode Pesawat: {e}{RESET}")
+
 def pastikan_pindah_aplikasi(driver, package_id):
     print(f"{YELLOW}>> 🔄 Mengecek posisi aplikasi ({package_id})...{RESET}")
     for i in range(3):
@@ -127,24 +139,7 @@ def pastikan_pindah_aplikasi(driver, package_id):
             time.sleep(2)
         except: pass
     return False
-def buka_url_browser_utama(driver, url):
-    pastikan_pindah_aplikasi(driver, ID_CHROME)
-    print(f"\n{CYAN}[BROWSER] Mengakses: {url} (Mode User 0)...{RESET}")
-    try:
-        cmd = f'adb -s {UDID_DEVICE} shell am start --user 0 -a android.intent.action.VIEW -d "{url}" -n com.android.chrome/com.google.android.apps.chrome.Main'
-        subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
-    except Exception as e:
-        try: driver.get(url)
-        except: return False
-    time.sleep(5)
-    return True
-def lewati_welcome_chrome(driver):
-    try:
-        if driver.find_elements(AppiumBy.ID, "com.android.chrome:id/terms_accept_btn"):
-            driver.find_element(AppiumBy.ID, "com.android.chrome:id/terms_accept_btn").click()
-        if driver.find_elements(AppiumBy.ID, "com.android.chrome:id/negative_button"):
-            driver.find_element(AppiumBy.ID, "com.android.chrome:id/negative_button").click()
-    except: pass
+
 def cek_dan_install_twitter(driver, wait):
     print(f"\n{CYAN}[SYSTEM] Mengecek keberadaan Twitter/X...{RESET}")
     if driver.is_app_installed(ID_TWITTER):
@@ -167,68 +162,58 @@ def cek_dan_install_twitter(driver, wait):
             return True
         time.sleep(3)
     return False
-def ambil_email_fresh(driver, wait):
-    buka_url_browser_utama(driver, URL_CITAYAM)
-    lewati_welcome_chrome(driver)
-    time.sleep(3)
-    email_lama = ""
+
+DOMAIN_TERLARANG = ["motormio.com", "wedansmail.com"]
+
+def ambil_email_api():
+    print(f"{YELLOW}>> ⏳ Meminta domain dari API Citayam...{RESET}")
+    url_domain = f"https://citayam.com/api/domains/{API_KEY}"
     try:
-        src = driver.page_source
-        found = re.findall(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}', src)
-        if found: email_lama = found[0]
-    except: pass
-    print(f"{YELLOW}>> 🧹 Menghapus email lama...{RESET}")
-    try:
-        driver.find_element(AppiumBy.XPATH, "//*[contains(@text, 'Hapus') or contains(@text, 'Delete')]").click()
-        time.sleep(2)
-    except: pass
-    print(f"{YELLOW}>> ⏳ Menunggu generate email BARU...{RESET}")
-    start_time = time.time()
-    while time.time() - start_time < 30:
-        try:
-            src = driver.page_source
-            found_emails = re.findall(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}', src)
-            if found_emails:
-                email_kandidat = found_emails[0]
-                if "motormio.com" in email_kandidat or "wedansmail.com" in email_kandidat:
-                    driver.find_element(AppiumBy.XPATH, "//*[contains(@text, 'Hapus') or contains(@text, 'Delete')]").click()
-                    time.sleep(5); continue
-                if email_kandidat != email_lama:
-                    print(f"{GREEN}>> ✅ EMAIL BARU DIDAPAT: {email_kandidat}{RESET}")
-                    return email_kandidat
-            try: driver.find_element(AppiumBy.XPATH, "//*[contains(@text, 'Segarkan')]").click()
-            except: pass
-        except: pass
-        time.sleep(3)
-    return None
-def ambil_otp_fresh(driver, wait):
-    print(f"\n{CYAN}>> 🚀 PINDAH KE CHROME UNTUK AMBIL OTP...{RESET}")
-    buka_url_browser_utama(driver, URL_CITAYAM)
-    time.sleep(5)
-    start_time = time.time()
-    print(f"{YELLOW}>> ⏳ Mencari Kode (Maks 45 detik)...{RESET}")
-    try:
-        driver.find_element(AppiumBy.XPATH, "//*[contains(@text, 'Segarkan')]").click(); time.sleep(3)
-    except: pass
-    while time.time() - start_time < 45:
-        try:
-            msgs = driver.find_elements(AppiumBy.XPATH, "//*[contains(@text, 'Twitter') or contains(@text, 'X') or contains(@text, 'verify')]")
-            if msgs:
-                print(f"{GREEN}>> 📩 Pesan ketemu! Klik...{RESET}")
-                msgs[0].click(); time.sleep(5)
-                try: visible_text = driver.find_element(AppiumBy.TAG_NAME, "body").text
-                except: visible_text = driver.page_source
-                otp_list = re.findall(r'\b\d{6}\b', visible_text)
-                for o in otp_list:
-                    if o not in BLACKLIST_OTP:
-                        print(f"{GREEN}>> ✅ OTP DITEMUKAN: {o}{RESET}")
-                        return o
+        response = requests.get(url_domain, timeout=10)
+        data_domain = response.json()
+        domain_pilihan = "citayam.com" 
+        if isinstance(data_domain, list) and len(data_domain) > 0:
+            domain_aman = [d for d in data_domain if d not in DOMAIN_TERLARANG]
+            if len(domain_aman) > 0:
+                domain_pilihan = random.choice(domain_aman) 
             else:
-                try: driver.find_element(AppiumBy.XPATH, "//*[contains(@text, 'Segarkan')]").click()
-                except: pass
-        except: pass
-        time.sleep(3)
+                print(f"{YELLOW}>> ⚠️ Semua domain dari API dilarang! Memakai default.{RESET}")
+        karakter_pilihan = string.ascii_lowercase + string.digits
+        nama_acak = ''.join(random.choices(karakter_pilihan, k=10))
+        email_baru = f"{nama_acak}@{domain_pilihan}"
+        print(f"{GREEN}>> ✅ EMAIL BARU DIDAPAT (API): {email_baru}{RESET}")
+        return email_baru
+    except Exception as e:
+        print(f"{RED}❌ Gagal mengambil domain via API: {e}{RESET}")
+        return None
+
+def ambil_otp_api(email_target):
+    print(f"\n{CYAN}>> 🚀 MENUNGGU OTP VIA API UNTUK: {email_target}...{RESET}")
+    url_pesan = f"https://citayam.com/api/messages/{email_target}/{API_KEY}"
+    start_time = time.time()
+    pesan_dibaca = []
+    while time.time() - start_time < 60: 
+        try:
+            response = requests.get(url_pesan, timeout=10)
+            data_pesan = response.json()
+            if isinstance(data_pesan, list) and len(data_pesan) > 0:
+                for pesan in data_pesan:
+                    pesan_id = pesan.get('id')
+                    if pesan_id not in pesan_dibaca:
+                        isi_teks = str(pesan.get('subject', '')) + " " + str(pesan.get('body', ''))
+                        match = re.search(r'\b\d{6}\b', isi_teks)
+                        if match:
+                            kode = match.group(0)
+                            if kode not in BLACKLIST_OTP and not kode.startswith("100"):
+                                print(f"{GREEN}>> ✅ OTP DITEMUKAN (API): {kode}{RESET}")
+                                return kode
+                        pesan_dibaca.append(pesan_id)
+        except Exception as e:
+            pass 
+        time.sleep(5) 
+    print(f"{RED}❌ OTP tidak kunjung masuk via API (Timeout).{RESET}")
     return None
+
 def cek_limit_jumlah_akun_dan_uninstall(driver):
     print(f"{YELLOW}>> 🔍 Cek Limit / Cloudflare...{RESET}")
     time.sleep(1.5)
@@ -247,6 +232,7 @@ def cek_limit_jumlah_akun_dan_uninstall(driver):
             except: pass   
     except: pass
     return False
+
 def klik_tombol_buat_akun_seperti_hp_kosong(driver, wait):
     print(f"{CYAN}>> [HP KOSONG] Mencari tombol 'Buat Akun'...{RESET}")
     try:
@@ -259,6 +245,7 @@ def klik_tombol_buat_akun_seperti_hp_kosong(driver, wait):
         except Exception as e: return False
     time.sleep(2)
     return cek_limit_jumlah_akun_dan_uninstall(driver)
+
 def buka_form_pendaftaran(driver, wait):
     if not cek_dan_install_twitter(driver, wait): return False
     print(f"\n{CYAN}[APP] Membuka Aplikasi Twitter...{RESET}")
@@ -266,29 +253,64 @@ def buka_form_pendaftaran(driver, wait):
     time.sleep(10)
     tutup_popup_google_smart_lock(driver) 
     tolak_perizinan(driver) 
+    print(f"{YELLOW}>> 🔍 Mengecek apakah ini Halaman Awal (Fresh Install)?{RESET}")
+    try:
+        tombol_buat_akun_awal = driver.find_elements(AppiumBy.XPATH, "//*[contains(@text, 'Create account') or contains(@text, 'Buat akun') or contains(@text, 'See what') or contains(@text, 'Lihat apa')]")
+        if tombol_buat_akun_awal:
+            print(f"{GREEN}>> 🆕 Terdeteksi Halaman Awal! (Aman){RESET}")
+        else:
+            print(f"{YELLOW}>> 🏠 Halaman Awal TIDAK ADA. Asumsi sedang LOGIN...{RESET}")
+            print(f"{YELLOW}>> 👊 Force Click HOME (Anti-Grok)...{RESET}")
+            try:
+                tombol_home = driver.find_elements(AppiumBy.XPATH, "//android.widget.FrameLayout[@content-desc='Home' or @content-desc='Beranda'] | //*[contains(@resource-id, 'home_tab')]")
+                if tombol_home:
+                    tombol_home[0].click()
+                    print(f"{GREEN}>> ✅ Sukses Klik Home. Posisi Netral.{RESET}")
+                    time.sleep(3)
+            except: pass
+    except: pass
     sudah_login = False
     try:
-        if driver.find_elements(AppiumBy.ACCESSIBILITY_ID, "Show navigation drawer"): sudah_login = True
-        elif driver.find_elements(AppiumBy.XPATH, "//*[contains(@text, 'Untuk Anda') or contains(@text, 'For You')]"): sudah_login = True
-        elif driver.find_elements(AppiumBy.XPATH, "//*[contains(@text, 'Mengikuti') or contains(@text, 'Following')]"): sudah_login = True
-    except: pass
+        indicators = [
+            "Show navigation drawer", 
+            "//android.widget.FrameLayout[@content-desc='Home']", 
+            "//android.widget.FrameLayout[@content-desc='Beranda']",
+            "//*[contains(@resource-id, 'composer_write')]",
+            "//*[contains(@text, 'Untuk Anda')]",
+            "//*[contains(@text, 'For You')]"
+        ]
+        for ind in indicators:
+            if "Slash" in ind or "//" in ind:
+                if driver.find_elements(AppiumBy.XPATH, ind):
+                    sudah_login = True; break
+            else:
+                if driver.find_elements(AppiumBy.ACCESSIBILITY_ID, ind):
+                    sudah_login = True; break
+    except Exception as e:
+        if "instrumentation" in str(e).lower(): return False 
     if sudah_login:
-        print(f"{YELLOW}>> [NAVIGASI] Status: SUDAH LOGIN. OTW Tambah Akun...{RESET}")
-        try:
-            print(f"{CYAN}>> Klik Profil...{RESET}")
-            try: driver.find_element(AppiumBy.ACCESSIBILITY_ID, "Show navigation drawer").click()
-            except: 
-                uk = driver.get_window_size()
-                driver.tap([(int(uk['width']*0.09), int(uk['height']*0.09))])
-            time.sleep(3)
-            print(f"{CYAN}>> Klik Menu Switcher...{RESET}")
-            try: driver.find_element(AppiumBy.ID, "com.twitter.android:id/user_switcher").click()
+        print(f"{YELLOW}>> [NAVIGASI] Status: SUDAH LOGIN (Di Menu Home). OTW Tambah Akun...{RESET}")
+        try:            
+            print(f"{CYAN}>> Klik Profil (Kiri Atas)...{RESET}")
+            try:
+                try: 
+                    driver.find_element(AppiumBy.XPATH, "//*[contains(@content-desc, 'Tampilkan penarik navigasi') or contains(@content-desc, 'Show navigation drawer')]").click()
+                except: 
+                    uk = driver.get_window_size()
+                    driver.tap([(int(uk['width']*0.09), int(uk['height']*0.09))])
+            except: pass
+            time.sleep(2)
+            tutup_popup_google_smart_lock(driver)
+            print(f"{CYAN}>> Klik Menu Switcher (Titik Tiga)...{RESET}")
+            try:
+                wait.until(EC.element_to_be_clickable((AppiumBy.XPATH, "//*[contains(@content-desc, 'Pindah akun') or contains(@resource-id, 'user_switcher')]"))).click()
             except:
                 uk = driver.get_window_size()
                 driver.tap([(int(uk['width']*0.72), int(uk['height']*0.11))])
-            time.sleep(3)
-            print(f"{CYAN}>> Klik 'Buat akun baru'...{RESET}")
-            try: driver.find_element(AppiumBy.XPATH, "//*[@text='Buat akun baru' or @text='Create a new account']").click()
+            time.sleep(2)
+            print(f"{CYAN}>> Klik 'Buat akun baru' (Menu Bawah)...{RESET}")
+            try:
+                wait.until(EC.element_to_be_clickable((AppiumBy.XPATH, "//*[contains(@text, 'Buat akun baru') or contains(@text, 'Create a new account')]"))).click()
             except:
                 uk = driver.get_window_size()
                 driver.tap([(int(uk['width']*0.5), int(uk['height']*0.78))])
@@ -307,6 +329,7 @@ def buka_form_pendaftaran(driver, wait):
         print(f"{GREEN}>> ✅ FORM SIAP DIISI!{RESET}")
         return True
     except: return False
+
 def tekan_tombol_lanjut_pendaftaran(driver, wait):
     print(f"{CYAN}>> [LIVE] Cari tombol Lanjut...{RESET}")
     try: driver.hide_keyboard()
@@ -320,6 +343,7 @@ def tekan_tombol_lanjut_pendaftaran(driver, wait):
     try: driver.press_keycode(66)
     except: pass
     return True
+
 def atur_tanggal_lahir_scroll_bawah(driver):
     print(f"{CYAN}>> 📅 Mengatur Tanggal Lahir...{RESET}")
     try: driver.hide_keyboard()
@@ -349,7 +373,11 @@ def atur_tanggal_lahir_scroll_bawah(driver):
         try: driver.find_element(AppiumBy.ID, "android:id/button1").click()
         except: driver.tap([(int(uk['width']*0.85), int(uk['height']*0.7))])
         print(f"{GREEN}>> ✅ Tanggal Lahir Selesai.{RESET}")
-    except Exception as e: print(f"{RED}⚠️ Gagal atur tanggal: {e}{RESET}")
+        return True 
+    except Exception as e: 
+        print(f"{RED}⚠️ Gagal atur tanggal: {e}{RESET}")
+        return False
+
 def isi_biodata_pintar(driver, wait, name_text, email_text):
     print(f"{CYAN}>> [FORM] Memulai pengisian cerdas...{RESET}")
     try:
@@ -373,51 +401,74 @@ def isi_biodata_pintar(driver, wait, name_text, email_text):
             driver.find_element(AppiumBy.XPATH, "(//android.widget.EditText)[2]").send_keys(email_text)
     except: pass
     time.sleep(1)
-    atur_tanggal_lahir_scroll_bawah(driver)
+    if not atur_tanggal_lahir_scroll_bawah(driver):
+        return False 
+    return True 
+
 def main():
     print_banner()
     counter = 1
+    fail_count = 0  
     while True:
         print(f"\n\n{CYAN}=== MEMBUAT AKUN KE - {counter} ==={RESET}")
         driver = None
         try:
+            if fail_count >= 3:
+                print(f"\n{RED}>> ⚠️ TERDETEKSI 3x GAGAL BERTURUT-TURUT! UNINSTALL & RESET...{RESET}")
+                try:
+                    temp_driver = webdriver.Remote('http://127.0.0.1:4723', options=options)
+                    try:
+                        temp_driver.remove_app(ID_TWITTER)
+                        print(f"{GREEN}>> ✅ Twitter Berhasil Di-uninstall.{RESET}")
+                    except Exception as e:
+                        print(f"{RED}❌ Gagal Uninstall: {e}{RESET}")
+                    finally:
+                        temp_driver.quit()
+                except Exception as e:
+                    print(f"{RED}❌ Gagal Init Driver untuk Uninstall: {e}{RESET}")
+                fail_count = 0
+                time.sleep(5)
             print(f"{YELLOW}>> 🔄 Memulai Driver Baru...{RESET}")
             driver = webdriver.Remote('http://127.0.0.1:4723', options=options)
             wait = WebDriverWait(driver, 60)
+            email = ambil_email_api()
+            if not email: 
+                if driver: driver.quit()
+                fail_count += 1 
+                print(f"{RED}>> ⚠️ KEGAGALAN KE-{fail_count} DARI 3{RESET}")
+                continue
             status_nav = buka_form_pendaftaran(driver, wait)
             if status_nav == "LIMIT":
                 print(f"{RED}⚠️ LIMIT TERDETEKSI (AWAL) - MODPES & RESTART...{RESET}")
                 refresh_ip_mode_pesawat(driver) 
                 if driver: driver.quit()
+                fail_count += 1 
+                print(f"{RED}>> ⚠️ KEGAGALAN KE-{fail_count} DARI 3{RESET}")
                 continue 
             if not status_nav: 
                 print(f"{RED}❌ Navigasi gagal.{RESET}")
                 refresh_ip_mode_pesawat(driver)
                 if driver: driver.quit()
-                continue
-            email = ambil_email_fresh(driver, wait)
-            if not email: 
-                if driver: driver.quit()
+                fail_count += 1 
+                print(f"{RED}>> ⚠️ KEGAGALAN KE-{fail_count} DARI 3{RESET}")
                 continue
             print(f"\n{CYAN}>> [TWITTER] Mengisi form...{RESET}")
             pastikan_pindah_aplikasi(driver, ID_TWITTER)
-            isi_biodata_pintar(driver, wait, get_random_name(), email)
+            if not isi_biodata_pintar(driver, wait, get_random_name(), email):
+                print(f"{RED}❌ Gagal Mengisi Biodata / Tanggal.{RESET}")
+                refresh_ip_mode_pesawat(driver)
+                if driver: driver.terminate_app(ID_TWITTER)
+                fail_count += 1 
+                print(f"{RED}>> ⚠️ KEGAGALAN KE-{fail_count} DARI 3{RESET}")
+                continue
             time.sleep(2)
             tekan_tombol_lanjut_pendaftaran(driver, wait)
             if cek_limit_jumlah_akun_dan_uninstall(driver):
                 print(f"{RED}⚠️ LIMIT/CLOUDFLARE TERDETEKSI (BIODATA) - MODPES & RESTART...{RESET}")
                 refresh_ip_mode_pesawat(driver)
                 if driver: driver.quit()
+                fail_count += 1 
                 continue
-            time.sleep(2)
-            tekan_tombol_lanjut_pendaftaran(driver, wait)
-            if cek_limit_jumlah_akun_dan_uninstall(driver):
-                refresh_ip_mode_pesawat(driver)
-                if driver: driver.quit()
-                continue
-            print(f"{CYAN}>> Klik Daftar...{RESET}")
-            time.sleep(2)
-            tekan_tombol_lanjut_pendaftaran(driver, wait)
             print(f"\n{RED}>> 🛑 TAHAN! Menunggu Loading Layar Hitam (10 detik)...{RESET}")
             time.sleep(10)
             print(f"{YELLOW}>> 🔍 Mengecek halaman OTP...{RESET}")
@@ -432,13 +483,10 @@ def main():
                 print(f"{YELLOW}⚠️ Belum masuk OTP, tekan Lanjut sekali lagi...{RESET}")
                 tekan_tombol_lanjut_pendaftaran(driver, wait)
                 time.sleep(5)
-            print(f"{YELLOW}>> ⏳ Memberi waktu notifikasi masuk (8 detik)...{RESET}")
-            time.sleep(8)
-            otp = ambil_otp_fresh(driver, wait)
+            otp = ambil_otp_api(email)
             if otp:
                 print(f"\n{GREEN}>> [TWITTER] Menginput Kode: {otp}{RESET}")
-                pastikan_pindah_aplikasi(driver, ID_TWITTER)
-                time.sleep(4)
+                time.sleep(2)
                 try:
                     kode_box = wait.until(EC.presence_of_element_located((AppiumBy.CLASS_NAME, "android.widget.EditText")))
                     kode_box.click(); kode_box.send_keys(otp)
@@ -475,20 +523,27 @@ def main():
                     print(f"{GREEN}>> ⚡ SELESAI! Langsung tutup aplikasi...{RESET}")
                     driver.terminate_app(ID_TWITTER)
                     counter += 1
+                    fail_count = 0 
                 except Exception as e:
                     print(f"{RED}❌ Error Finishing: {e}{RESET}")
                     refresh_ip_mode_pesawat(driver)
                     driver.terminate_app(ID_TWITTER)
+                    fail_count += 1 
+                    print(f"{RED}>> ⚠️ KEGAGALAN KE-{fail_count} DARI 3{RESET}")
             else:
                 print(f"{RED}❌ Gagal OTP.{RESET}")
                 refresh_ip_mode_pesawat(driver)
                 driver.terminate_app(ID_TWITTER)      
+                fail_count += 1 
+                print(f"{RED}>> ⚠️ KEGAGALAN KE-{fail_count} DARI 3{RESET}")
             time.sleep(3)
         except Exception as e:
             print(f"{RED}⚠️ TERJADI CRASH/ERROR UTAMA: {e}{RESET}")
             if driver:
                 refresh_ip_mode_pesawat(driver)
-            time.sleep(5)
+            fail_count += 1 
+            print(f"{RED}>> ⚠️ KEGAGALAN KE-{fail_count} DARI 3{RESET}")
+            time.sleep(5) 
         finally:
             if driver:
                 print(f"{YELLOW}>> Menutup Sesi Driver...{RESET}")
@@ -496,7 +551,6 @@ def main():
                 except: pass
             print(f"\n{YELLOW}>> 💤 Memulai ulang loop HP Fresh...{RESET}")
             time.sleep(5)
+
 if __name__ == "__main__":
-
     main()
-
