@@ -20,12 +20,15 @@ init(autoreset=True)
 BANNER_JUDUL = "AUTO   TWITTER"
 BANNER_NAMA  = "Tools By : Ruff"
 ID_TWITTER = "com.twitter.android"
-PASSWORD_AKUN = "CONTOH" #atur pasword tiap akun
-NAMA_FILE_HASIL = "CONTOH.TXT" #nama file output akun berhasil 
+PASSWORD_AKUN = "kontol87"
+NAMA_FILE_HASIL = "data_akun1.txt"
 BLACKLIST_OTP = ["2024", "2025", "2026", "2023", "123456", "000000"]
-API_KEY = "" #ISI APIKEY DENGAN ANDA MENUJU LINK CITAYAM.COM DAN MEMINTA API KEY
-UDID_DEVICE = ""  #UID DEVICE SETELAH MENJALANKAN PERINTAH ADB DEVICES
-DEVICE_NAME = 'Redmi Note 14 Pro' #gapenting
+
+API_BASE_URL = "https://rufff3.my.id/" 
+DOMAIN_SENDIRI = ["rufff3.my.id", "cuontol.my.id"]
+
+UDID_DEVICE = "cfe0fe2" 
+DEVICE_NAME = 'Redmi Note 14 Pro'
 
 CYAN = "\033[96m"
 GREEN = "\033[92m"
@@ -58,8 +61,21 @@ def print_banner():
     print("\n")
 
 def get_random_name():
-    depan = ["Rudi", "Bayu", "Eko", "Dina", "Siti", "Reza", "Fajar", "Adit", "Gilang", "Putri", "Dewi", "Budi", "Sari", "Indra", "Maya", "saikul", "Rizky", "Nina", "Agus", "Lina", "Hendra", "Dian", "Yudi", "Rina", "Fauzi", "Siska", "Andi", "Wulan", "Eka", "Rama", "Sinta", "Doni", "Mira", "Hadi", "Rani", "Fikri", "Sari", "Ilham", "Nia", "Bambang", "Dina", "Rizal", "Sari", "Yanto", "Lina", "Hendra", "Dian", "Yudi", "Rina", "Fauzi", "Siska", "Andi", "Wulan"]
-    belakang = ["Santoso", "Pratama", "Wijaya", "Kusuma", "Saputra", "Hidayat", "Siregar", "Utami", "Nugroho", "Wibowo", "Subagja", "Ramadhan", "pebrianto", "Putra", "Lestari", "Gunawan", "Sari", "Purnama", "Kurniawan", "Dewi", "Saputro", "Yuliana", "Fadhil", "Amelia", "Hidayah", "Prasetyo", "Sari", "Wahyudi", "Aulia"]
+    depan = [
+    "Emma", "Olivia", "Ava", "Isabella", "Sophia", "Mia", "Charlotte", "Amelia", 
+    "Harper", "Evelyn", "Abigail", "Emily", "Elizabeth", "Mila", "Ella", "Avery", 
+    "Sofia", "Camila", "Aria", "Scarlett", "Victoria", "Madison", "Luna", "Grace", 
+    "Chloe", "Penelope", "Layla", "Riley", "Zoey", "Nora", "Lily", "Eleanor", 
+    "Hannah", "Lillian", "Addison", "Aubrey", "Ellie", "Stella", "Natalie", "Zoe", 
+    "Leah", "Hazel", "Violet", "Aurora", "Savannah", "Audrey", "Brooklyn", "Bella", 
+    "Claire", "Skylar", "Lucy", "Paisley", "Everly"
+]
+    belakang = [
+    "Smith", "Johnson", "Williams", "Brown", "Jones", "Miller", "Davis", "Garcia", 
+    "Rodriguez", "Wilson", "Martinez", "Anderson", "Taylor", "Thomas", "Hernandez", 
+    "Moore", "Martin", "Jackson", "Thompson", "White", "Lopez", "Lee", "Gonzalez", 
+    "Harris", "Clark", "Lewis", "Robinson", "Walker", "Perez"
+]
     return f"{random.choice(depan)} {random.choice(belakang)}"
 
 def simpan_akun_ke_txt(username, email):
@@ -163,56 +179,61 @@ def cek_dan_install_twitter(driver, wait):
         time.sleep(3)
     return False
 
-DOMAIN_TERLARANG = ["motormio.com", "wedansmail.com"]
-
+# ==============================================================================
+# FUNGSI BARU: MENGAMBIL EMAIL DARI SISTEM SENDIRI
+# ==============================================================================
 def ambil_email_api():
-    print(f"{YELLOW}>> ⏳ Meminta domain dari API Citayam...{RESET}")
-    url_domain = f"https://citayam.com/api/domains/{API_KEY}"
+    print(f"{YELLOW}>> ⏳ Membuat kombinasi email lokal...{RESET}")
     try:
-        response = requests.get(url_domain, timeout=10)
-        data_domain = response.json()
-        domain_pilihan = "citayam.com" 
-        if isinstance(data_domain, list) and len(data_domain) > 0:
-            domain_aman = [d for d in data_domain if d not in DOMAIN_TERLARANG]
-            if len(domain_aman) > 0:
-                domain_pilihan = random.choice(domain_aman) 
-            else:
-                print(f"{YELLOW}>> ⚠️ Semua domain dari API dilarang! Memakai default.{RESET}")
+        domain_pilihan = random.choice(DOMAIN_SENDIRI)
         karakter_pilihan = string.ascii_lowercase + string.digits
         nama_acak = ''.join(random.choices(karakter_pilihan, k=10))
         email_baru = f"{nama_acak}@{domain_pilihan}"
-        print(f"{GREEN}>> ✅ EMAIL BARU DIDAPAT (API): {email_baru}{RESET}")
+        print(f"{GREEN}>> ✅ EMAIL BARU: {email_baru}{RESET}")
         return email_baru
     except Exception as e:
-        print(f"{RED}❌ Gagal mengambil domain via API: {e}{RESET}")
+        print(f"{RED}❌ Gagal membuat kombinasi email: {e}{RESET}")
         return None
 
+# ==============================================================================
+# FUNGSI BARU: MENGAMBIL OTP DARI ENDPOINT SENDIRI
+# ==============================================================================
 def ambil_otp_api(email_target):
-    print(f"\n{CYAN}>> 🚀 MENUNGGU OTP VIA API UNTUK: {email_target}...{RESET}")
-    url_pesan = f"https://citayam.com/api/messages/{email_target}/{API_KEY}"
+    print(f"\n{CYAN}>> 🚀 MENUNGGU OTP DARI DATABASE LOKAL UNTUK: {email_target}...{RESET}")
+    url_pesan = f"{API_BASE_URL}/api/emails/{email_target}"
+    
     start_time = time.time()
     pesan_dibaca = []
-    while time.time() - start_time < 60: 
+    
+    while time.time() - start_time < 60:
         try:
             response = requests.get(url_pesan, timeout=10)
-            data_pesan = response.json()
-            if isinstance(data_pesan, list) and len(data_pesan) > 0:
-                for pesan in data_pesan:
-                    pesan_id = pesan.get('id')
-                    if pesan_id not in pesan_dibaca:
-                        isi_teks = str(pesan.get('subject', '')) + " " + str(pesan.get('body', ''))
-                        match = re.search(r'\b\d{6}\b', isi_teks)
-                        if match:
-                            kode = match.group(0)
-                            if kode not in BLACKLIST_OTP and not kode.startswith("100"):
-                                print(f"{GREEN}>> ✅ OTP DITEMUKAN (API): {kode}{RESET}")
-                                return kode
-                        pesan_dibaca.append(pesan_id)
+            if response.status_code == 200:
+                data_pesan = response.json()
+                
+                if isinstance(data_pesan, list) and len(data_pesan) > 0:
+                    for pesan in data_pesan:
+                        pesan_id = pesan.get('id')
+                        
+                        if pesan_id not in pesan_dibaca:
+                            isi_teks = str(pesan.get('subject', '')) + " " + str(pesan.get('body_text', ''))
+                            
+                            match = re.search(r'\b\d{6}\b', isi_teks)
+                            if match:
+                                kode = match.group(0)
+                                if kode not in BLACKLIST_OTP and not kode.startswith("100"):
+                                    print(f"{GREEN}>> ✅ OTP DITEMUKAN: {kode}{RESET}")
+                                    return kode
+                            
+                            pesan_dibaca.append(pesan_id)
         except Exception as e:
             pass 
+            
         time.sleep(5) 
-    print(f"{RED}❌ OTP tidak kunjung masuk via API (Timeout).{RESET}")
+        
+    print(f"{RED}❌ OTP tidak kunjung masuk (Timeout).{RESET}")
     return None
+# ==============================================================================
 
 def cek_limit_jumlah_akun_dan_uninstall(driver):
     print(f"{YELLOW}>> 🔍 Cek Limit / Cloudflare...{RESET}")
@@ -317,6 +338,7 @@ def buka_form_pendaftaran(driver, wait):
             time.sleep(5)
             if cek_limit_jumlah_akun_dan_uninstall(driver): return "LIMIT"
             if klik_tombol_buat_akun_seperti_hp_kosong(driver, wait): return "LIMIT"
+            
         except Exception as e: 
             print(f"{RED}❌ Gagal Navigasi Login: {e}{RESET}")
             return False         
@@ -431,12 +453,16 @@ def main():
             print(f"{YELLOW}>> 🔄 Memulai Driver Baru...{RESET}")
             driver = webdriver.Remote('http://127.0.0.1:4723', options=options)
             wait = WebDriverWait(driver, 60)
+            
+            # 1. Generate Email Lokal (Tanpa Request Eksternal)
             email = ambil_email_api()
             if not email: 
                 if driver: driver.quit()
                 fail_count += 1 
                 print(f"{RED}>> ⚠️ KEGAGALAN KE-{fail_count} DARI 3{RESET}")
                 continue
+
+            # 2. Buka App Twitter dan Navigasi
             status_nav = buka_form_pendaftaran(driver, wait)
             if status_nav == "LIMIT":
                 print(f"{RED}⚠️ LIMIT TERDETEKSI (AWAL) - MODPES & RESTART...{RESET}")
@@ -452,25 +478,36 @@ def main():
                 fail_count += 1 
                 print(f"{RED}>> ⚠️ KEGAGALAN KE-{fail_count} DARI 3{RESET}")
                 continue
+            
+            # 3. Isi Form Pendaftaran
             print(f"\n{CYAN}>> [TWITTER] Mengisi form...{RESET}")
             pastikan_pindah_aplikasi(driver, ID_TWITTER)
             if not isi_biodata_pintar(driver, wait, get_random_name(), email):
                 print(f"{RED}❌ Gagal Mengisi Biodata / Tanggal.{RESET}")
                 refresh_ip_mode_pesawat(driver)
-                if driver: driver.terminate_app(ID_TWITTER)
+                if driver: 
+                    try:
+                        subprocess.run(f'adb -s {UDID_DEVICE} shell am force-stop {ID_TWITTER}', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                        time.sleep(1)
+                        driver.terminate_app(ID_TWITTER)
+                    except Exception: pass
                 fail_count += 1 
                 print(f"{RED}>> ⚠️ KEGAGALAN KE-{fail_count} DARI 3{RESET}")
                 continue
+            
             time.sleep(2)
             tekan_tombol_lanjut_pendaftaran(driver, wait)
+            
             if cek_limit_jumlah_akun_dan_uninstall(driver):
                 print(f"{RED}⚠️ LIMIT/CLOUDFLARE TERDETEKSI (BIODATA) - MODPES & RESTART...{RESET}")
                 refresh_ip_mode_pesawat(driver)
                 if driver: driver.quit()
                 fail_count += 1 
                 continue
+
             print(f"\n{RED}>> 🛑 TAHAN! Menunggu Loading Layar Hitam (10 detik)...{RESET}")
             time.sleep(10)
+            
             print(f"{YELLOW}>> 🔍 Mengecek halaman OTP...{RESET}")
             otp_page = False
             for _ in range(5):
@@ -483,7 +520,10 @@ def main():
                 print(f"{YELLOW}⚠️ Belum masuk OTP, tekan Lanjut sekali lagi...{RESET}")
                 tekan_tombol_lanjut_pendaftaran(driver, wait)
                 time.sleep(5)
+            
+            # 4. Ambil OTP via API Lokal
             otp = ambil_otp_api(email)
+            
             if otp:
                 print(f"\n{GREEN}>> [TWITTER] Menginput Kode: {otp}{RESET}")
                 time.sleep(2)
@@ -521,19 +561,37 @@ def main():
                     except: pass
                     simpan_akun_ke_txt(username_final, email)
                     print(f"{GREEN}>> ⚡ SELESAI! Langsung tutup aplikasi...{RESET}")
-                    driver.terminate_app(ID_TWITTER)
+                    
+                    try:
+                        subprocess.run(f'adb -s {UDID_DEVICE} shell am force-stop {ID_TWITTER}', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                        time.sleep(1)
+                        driver.terminate_app(ID_TWITTER)
+                    except Exception: pass
+                    
                     counter += 1
                     fail_count = 0 
                 except Exception as e:
                     print(f"{RED}❌ Error Finishing: {e}{RESET}")
                     refresh_ip_mode_pesawat(driver)
-                    driver.terminate_app(ID_TWITTER)
+                    
+                    try:
+                        subprocess.run(f'adb -s {UDID_DEVICE} shell am force-stop {ID_TWITTER}', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                        time.sleep(1)
+                        driver.terminate_app(ID_TWITTER)
+                    except Exception: pass
+                    
                     fail_count += 1 
                     print(f"{RED}>> ⚠️ KEGAGALAN KE-{fail_count} DARI 3{RESET}")
             else:
                 print(f"{RED}❌ Gagal OTP.{RESET}")
                 refresh_ip_mode_pesawat(driver)
-                driver.terminate_app(ID_TWITTER)      
+                
+                try:
+                    subprocess.run(f'adb -s {UDID_DEVICE} shell am force-stop {ID_TWITTER}', shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    time.sleep(1)
+                    driver.terminate_app(ID_TWITTER)
+                except Exception: pass
+                
                 fail_count += 1 
                 print(f"{RED}>> ⚠️ KEGAGALAN KE-{fail_count} DARI 3{RESET}")
             time.sleep(3)
